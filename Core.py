@@ -1,23 +1,21 @@
 import pygame
 from defaults import *
+import random
 
-
-def nextStep():
-    ### recombine the genomes
+def next():### recombine the genomes
     pass
 
-def newGene(parentalData: "str"):
+def newGene(dp1, parentalData: "str" = None):
     if parentalData != None:
         ### full random (int, int, int, int)
+        gene = (random.randint(0, dp1))### duplicate and figure out the plus one? needs current genome length
         pass
     elif parentalData[-2:] == "+m":
-        ### clean the string
-        ### next step
-        ### mutate the result
-        # gene = mutated result
+        gene = next(parentalData[:-2])
+        # gene = mutate(gene)
         pass
     else:
-        gene = nextStep(parentalData)
+        gene = next(parentalData)
     return gene
 
 class organism():
@@ -30,10 +28,10 @@ class world():
     The world is a 2-D euclidean plane tiled with equivalent squares.
     Only render as much of the world as you need.
     '''
-    def __init__(self, hwSize) -> None:
+    def __init__(self, hwSize:"pygame.surface._Coordinate") -> None:
         self.HEIGHT, self.WIDTH = hwSize
+        
         pass
-
 
 def blit_text(surface, text, pos, font, color=pygame.Color("black")):
     # Got this incredibly helpful function from https://stackoverflow.com/questions/42014195/rendering-text-with-multiple-lines-in-pygame
@@ -73,8 +71,7 @@ def buildBackdrop(size:"pygame.surface._Coordinate"):
     return backdrop
 
 def core():
-    # initialize pygame and create window
-    pygame.init()
+    pygame.init()# initialize pygame and create window
     # pygame.mixer.init()
     debugFont = pygame.font.SysFont("monospace", 15)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -123,7 +120,6 @@ def core():
 
         # Render
         screen.fill(BLACK)
-        screen.blit(background, (0, 0))
         all_sprites.draw(screen)
         if debugHUDtoggle:
             DebugText = f"Simulation Runtime: {simRuntime}\nFog Level: {fogLevel}\nLiving plants: {len(plants.sprites())}\nSun Energy: to be displayed per tile"
@@ -140,3 +136,10 @@ if __name__ == "__main__":
 # When a mutation occurs, how much variation should an int have access to? (Min/Max)
 # 
 # 
+
+
+# solid color background (grid color)
+# draw tiles
+    # "untouchables" tiles (air, fire)
+    # "touchables" (water, earth)
+    # tokens/solid tiles (stone, seed, outgrowth, leaf, branch, root)
