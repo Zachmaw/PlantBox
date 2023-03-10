@@ -1,8 +1,9 @@
 import pygame
 from defaults import *
 import random
+import time
 
-def next():### recombine the genomes
+def next():### recombine the genomes?
     pass
 
 def newGene(dp1, parentalData: "str" = None):
@@ -23,14 +24,22 @@ class organism():
         self.energy = energy
         pass
 
-class world():
+class World():
     '''
     The world is a 2-D euclidean plane tiled with equivalent squares.
     Only render as much of the world as you need.
+    Represented as a list of lists of strings?
+    Represented as a world of rows of tiles.
     '''
     def __init__(self, hwSize:"pygame.surface._Coordinate") -> None:
         self.HEIGHT, self.WIDTH = hwSize
-        
+        ### build world full of air
+        self.grid = list()# simple list to save your data
+        for row in range(self.WIDTH):
+            self.grid.append(list()) # new column for the list
+            for tile in range(self.HEIGHT):
+                self.grid[row][tile] = "air"
+
         pass
 
 def blit_text(surface, text, pos, font, color=pygame.Color("black")):
@@ -53,81 +62,94 @@ def blit_text(surface, text, pos, font, color=pygame.Color("black")):
         if y >= max_height + word_height / 2:# my edit started here
             print("Not all debug text could be displayed...")
 
-def buildBackdrop(size:"pygame.surface._Coordinate"):
-    def flipColor(colorState, colorA:"tuple[int,int,int]", colorB:"tuple[int,int,int]"):
-        if not colorState or colorState == colorA:
-            colorState = colorB
-        else: 
-            colorState = colorA
-        return colorState
-    c = None
-    backdrop = pygame.surface.Surface(size)
-    backdrop.fill(BLACK)
-    for y in range(0,HEIGHT,cellSize): 
-        c = flipColor(c, RED, BLACK)
-        for x in range(0,WIDTH,cellSize):
-            c = flipColor(c, RED, BLACK)
-            pygame.draw.rect(backdrop, c, pygame.Rect(x, y, x+cellSize, y+cellSize))
-    return backdrop
+# def buildBackdrop(size:"pygame.surface._Coordinate"):
+#     def flipColor(colorState, colorA:"tuple[int,int,int]", colorB:"tuple[int,int,int]"):
+#         if not colorState or colorState == colorA:
+#             colorState = colorB
+#         else: 
+#             colorState = colorA
+#         return colorState
+#     c = None
+#     backdrop = pygame.surface.Surface(size)
+#     backdrop.fill(BLACK)
+#     for y in range(0,HEIGHT,cellSize): 
+#         c = flipColor(c, RED, BLACK)
+#         for x in range(0,WIDTH,cellSize):
+#             c = flipColor(c, RED, BLACK)
+#             pygame.draw.rect(backdrop, c, pygame.Rect(x, y, x+cellSize, y+cellSize))
+#     return backdrop
+
+def toggle(param: "bool"):
+    if param:
+        return False
+    else:
+        return True
+
+def gridDecode(mousePos):
+    tileCoordinate = mousePos### figure out which tile coordinate the mouse is on
+    return tileCoordinate
+
+def showTileSelection():### for a limited time with fade out.
+    pass# now = time.
 
 def core():
     pygame.init()# initialize pygame and create window
     # pygame.mixer.init()
     debugFont = pygame.font.SysFont("monospace", 15)
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("AgentSim")
+    pygame.display.set_caption("Planter")
     clock = pygame.time.Clock()
-    background = buildBackdrop(screen.get_rect().size)
-    # define groups
-    all_sprites = pygame.sprite.Group()
+    tiles = pygame.sprite.Group()# define groups
     plants = pygame.sprite.Group()
     ### build the world
+    world = World()
     running = True# main loop
     clock = pygame.time.Clock()
     while running:
         clock.tick(FPS)
         keys = pygame.key.get_pressed()# pressedKeysDict
-        shiftKeys = [keys[pygame.K_LSHIFT], keys[pygame.K_RSHIFT]]
+        # shiftKeys = [keys[pygame.K_LSHIFT], keys[pygame.K_RSHIFT]]
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
             elif event.type == pygame.MOUSEBUTTONDOWN:
-                mousePos = pygame.mouse.get_pos()
-                print(mousePos)
-                if any(shiftKeys):
-                    pass
-                else:
-                    pass
-            elif event.type == pygame.KEYDOWN:
-                # if event.key == pygame.K_w or event.key == pygame.K_UP:
+                x, y = (event.pos[0] // cellSize, event.pos[1] // cellSize)# Get tile coord from mouse location
+                # if any(shiftKeys):
                 #     pass
-                if event.key == pygame.K_SPACE:# toggle time paused
-                    if pauseToggle:
-                        pauseToggle = False
-                    else:
-                        pauseToggle = True
-                elif event.key == pygame.K_F1:
-                    if debugHUDtoggle:
-                        debugHUDtoggle = False
-                    else:
-                        debugHUDtoggle = True
-        ### Check collisions
+                # else:
+                #     pass
+                print(f"You clicked box {x}, {y}.")
+                ### set selected box to selected tile
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_w or event.key == pygame.K_UP:
+                    pass### increase current selection
+                elif event.key == pygame.K_s or event.key == pygame.K_DOWN:
+                    pass### decrease current selection
+                elif event.key == pygame.K_a or event.key == pygame.K_LEFT:
+                    pass### select previous option
+                elif event.key == pygame.K_d or event.key == pygame.K_RIGHT:
+                    pass### select next option
+                elif event.key == pygame.K_SPACE:# toggle time paused
+                    pauseToggle = toggle(pauseToggle)
+                elif event.key == pygame.K_F1:# toggle debug HUD
+                    debugHUDtoggle = toggle(debugHUDtoggle)
 
         # Update
         if not pauseToggle:
-            all_sprites.update()
+            tiles.update()### Check collisions?
             simRuntime += 1
 
         # Render
         screen.fill(BLACK)
-        all_sprites.draw(screen)
+        tiles.draw(screen)
+        plants.draw(screen)
         if debugHUDtoggle:
             DebugText = f"Simulation Runtime: {simRuntime}\nFog Level: {fogLevel}\nLiving plants: {len(plants.sprites())}\nSun Energy: to be displayed per tile"
             blit_text(screen, DebugText, (20, 20), debugFont, color = pygame.Color("white"))
         pygame.display.flip()
 
     pygame.quit()
-
+    
 if __name__ == "__main__":
     core()
 
