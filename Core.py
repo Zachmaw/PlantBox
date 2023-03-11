@@ -1,45 +1,63 @@
 import pygame
 from defaults import *
-import random
-import time
+# import random
+# import time
 
-def next():### recombine the genomes?
-    pass
+# def next():### recombine the genomes?
+#     pass
 
-def newGene(dp1, parentalData: "str" = None):
-    if parentalData != None:
-        ### full random (int, int, int, int)
-        gene = (random.randint(0, dp1))### duplicate and figure out the plus one? needs current genome length
-        pass
-    elif parentalData[-2:] == "+m":
-        gene = next(parentalData[:-2])
-        # gene = mutate(gene)
-        pass
-    else:
-        gene = next(parentalData)
-    return gene
+# def newGene(currentGenomeLength, parentalData: "str" = None):
+#     if parentalData != None:
+#         ### full random (int, int, int, int)
+#         gene = (random.randint(0, currentGenomeLength + 1))### duplicate? I have no idea.
+#         pass
+#     elif parentalData[-2:] == "+m":
+#         gene = next(parentalData[:-2])
+#         # gene = mutate(gene)
+#         pass
+#     else:
+#         gene = next(parentalData)
+#     return gene
 
-class organism():
-    def __init__(self, energy) -> None:
-        self.energy = energy
-        pass
+# class Organism():
+#     def __init__(self, seed: "tuple") -> None:
+#         self.energy = seed[0]
+#         pass
+
+class Tile(pygame.sprite.Sprite):
+    def __init__(self) -> None:
+        pygame.sprite.Sprite.__init__()
+        self.image = 
+
+
+class Token(pygame.sprite.Sprite):
+    def __init__(self) -> None:
+        pygame.sprite.Sprite.__init__()
+    
 
 class World():
     '''
     The world is a 2-D euclidean plane tiled with equivalent squares.
-    Only render as much of the world as you need.
     Represented as a list of lists of strings?
     Represented as a world of rows of tiles.
     '''
-    def __init__(self, hwSize:"pygame.surface._Coordinate") -> None:
-        self.HEIGHT, self.WIDTH = hwSize
+    def __init__(self, hwGridSize:"pygame.surface._Coordinate") -> None:
+        self.HEIGHT, self.WIDTH = hwGridSize
         ### build world full of air
-        self.grid = list()# simple list to save your data
-        for row in range(self.WIDTH):
+        self.grid = list()# simple list to save data
+        for row in range(self.WIDTH):# in every row
             self.grid.append(list()) # new column for the list
-            for tile in range(self.HEIGHT):
-                self.grid[row][tile] = "air"
+            if row >= gridHeight - groundLevel:
+                for tile in range(self.HEIGHT):# and for every tile
+                    self.grid[row][tile] = "earth"# soil.
+            else:
+                for tile in range(self.HEIGHT):# and for every tile
+                    self.grid[row][tile] = "air"# air.
 
+    def advance(self):
+        ### everything gets processed
+        # physics on each tile somehow
+        # growth step( cycle through each plant. how to assign priority when competing for a tile?)
         pass
 
 def blit_text(surface, text, pos, font, color=pygame.Color("black")):
@@ -85,12 +103,12 @@ def toggle(param: "bool"):
     else:
         return True
 
-def gridDecode(mousePos):
-    tileCoordinate = mousePos### figure out which tile coordinate the mouse is on
-    return tileCoordinate
+# def gridDecode(mousePos):
+#     tileCoordinate = mousePos### figure out which tile coordinate the mouse is on
+#     return tileCoordinate
 
-def showTileSelection():### for a limited time with fade out.
-    pass# now = time.
+# def showTileSelection():### for a limited time with fade out.
+#     pass# now = time.
 
 def core():
     pygame.init()# initialize pygame and create window
@@ -102,7 +120,7 @@ def core():
     tiles = pygame.sprite.Group()# define groups
     plants = pygame.sprite.Group()
     ### build the world
-    world = World()
+    box = World((gridHeight, gridWidth))
     running = True# main loop
     clock = pygame.time.Clock()
     while running:
@@ -136,13 +154,12 @@ def core():
 
         # Update
         if not pauseToggle:
-            tiles.update()### Check collisions?
+            box.advance()
             simRuntime += 1
 
         # Render
         screen.fill(BLACK)
-        tiles.draw(screen)
-        plants.draw(screen)
+        ###
         if debugHUDtoggle:
             DebugText = f"Simulation Runtime: {simRuntime}\nFog Level: {fogLevel}\nLiving plants: {len(plants.sprites())}\nSun Energy: to be displayed per tile"
             blit_text(screen, DebugText, (20, 20), debugFont, color = pygame.Color("white"))

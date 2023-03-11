@@ -3,6 +3,7 @@ gridWidth = 10
 gridHeight = 10
 sunMult = 0.95
 fogLevel = 0
+groundLevel = 3
 lightCycleDuration = 30
 darknessDuration = 8
 FPS = 60
